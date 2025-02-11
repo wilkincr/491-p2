@@ -93,21 +93,16 @@ func (ck *Clerk) doOperation(op Op, key string,
 	for true {
 		// Issue until RPC succeeds
 		for {
-			log.Println(reply.Err)
 			ok := call(ck.primary, "PBServer.Operation", args, &reply)
 			if ok {
-				log.Printf("DoOp RPC issued to %s succeeded\n", ck.primary)
-				log.Printf("DoOp RPC returned %s\n", reply.Err)
 				break
 			}
-			log.Printf("DoOp RPC issued to %s failed\n", ck.primary)
 			time.Sleep(viewservice.PingInterval)
 			ck.refreshPrimary()
 		}
 
 		if reply.Err == ErrWrongServer {
 			ck.refreshPrimary()
-			log.Println("Primary refreshed")
 		} else {
 			return
 		}
@@ -121,8 +116,6 @@ func (ck *Clerk) Get(key string) string {
 
 	log.Printf("%s: Getting value for key %s\n", ck.me, key)
 	ck.doOperation(GET, key, "", &reply)
-	// ADDED
-	log.Println(reply.Err)
 
 	if reply.Err == ErrNoKey {
 		return ""
