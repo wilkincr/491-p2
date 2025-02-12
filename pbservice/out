@@ -1,393 +1,236 @@
-Test: Repeated failures/restarts with concurrent updates to same key; unreliable ...
-2025/02/11 13:56:21 sendPush received
-2025/02/11 13:56:21 Push: primary=/var/tmp/824-1000/pb-15824-rcu-1, backup=/var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:21 
-2025/02/11 13:56:21 Push received
-2025/02/11 13:56:21 Pulling on backup
-2025/02/11 13:56:21 
-No good!
-2025/02/11 13:56:22 PBClient-1: Appending value x 1 0 y to key 0
-2025/02/11 13:56:22 PBClient-2: Appending value x 0 0 y to key 0
-Killing pbserver /var/tmp/824-1000/pb-15824-rcu-3
-No good!
-2025/02/11 13:56:22 Operation called by PBClient-2 for Append key=0 val=x 0 0 y; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:22 I'm /var/tmp/824-1000/pb-15824-rcu-1
-2025/02/11 13:56:22 Forwarding to backup: /var/tmp/824-1000/pb-15824-rcu-3
-No good!
-No good!
-No good!
-No good!
-No good!
-No good!
-No good!
-No good!
-No good!
-2025/02/11 13:56:23 Operation called by /var/tmp/824-1000/pb-15824-rcu-1 for Append key=0 val=x 0 0 y; current P= B=
-2025/02/11 13:56:23 I'm /var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:23 Operation called by PBClient-1 for Append key=0 val=x 1 0 y; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:23 I'm /var/tmp/824-1000/pb-15824-rcu-1
-2025/02/11 13:56:23 Forwarding to backup: /var/tmp/824-1000/pb-15824-rcu-3
-read unix @->/var/tmp/824-1000/pb-15824-rcu-3: read: connection reset by peer
-unexpected EOF
-2025/02/11 13:56:23 Operation called by /var/tmp/824-1000/pb-15824-rcu-1 for Append key=0 val=x 1 0 y; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-2
-2025/02/11 13:56:23 I'm /var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:23 Duplicate operation from PBClient-1
-No good!
-2025/02/11 13:56:23 PBClient-1: Getting value for key 0
-2025/02/11 13:56:23 Operation called by PBClient-1 for Get key=0 val=; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:23 I'm /var/tmp/824-1000/pb-15824-rcu-1
-2025/02/11 13:56:23 Forwarding to backup: /var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:23 Operation called by /var/tmp/824-1000/pb-15824-rcu-1 for Get key=0 val=; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-2
-2025/02/11 13:56:23 I'm /var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:23 PBClient-1: Appending value x 1 1 y to key 0
-unexpected EOF
-2025/02/11 13:56:23 Operation called by PBClient-1 for Append key=0 val=x 1 1 y; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:23 I'm /var/tmp/824-1000/pb-15824-rcu-1
-2025/02/11 13:56:23 Forwarding to backup: /var/tmp/824-1000/pb-15824-rcu-3
-unexpected EOF
-2025/02/11 13:56:23 Operation called by /var/tmp/824-1000/pb-15824-rcu-1 for Append key=0 val=x 1 1 y; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-2
-2025/02/11 13:56:23 I'm /var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:23 Duplicate operation from PBClient-1
-2025/02/11 13:56:23 Operation called by PBClient-2 for Append key=0 val=x 0 0 y; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:23 I'm /var/tmp/824-1000/pb-15824-rcu-1
-2025/02/11 13:56:23 Forwarding to backup: /var/tmp/824-1000/pb-15824-rcu-3
-read unix @->/var/tmp/824-1000/pb-15824-rcu-3: read: connection reset by peer
-2025/02/11 13:56:23 Operation called by /var/tmp/824-1000/pb-15824-rcu-1 for Append key=0 val=x 0 0 y; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-2
-2025/02/11 13:56:23 I'm /var/tmp/824-1000/pb-15824-rcu-3
-No good!
-2025/02/11 13:56:23 PBClient-2: Getting value for key 0
-2025/02/11 13:56:23 Operation called by PBClient-2 for Get key=0 val=; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:23 I'm /var/tmp/824-1000/pb-15824-rcu-1
-2025/02/11 13:56:23 Forwarding to backup: /var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:23 Operation called by /var/tmp/824-1000/pb-15824-rcu-1 for Get key=0 val=; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-2
-2025/02/11 13:56:23 I'm /var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:23 PBClient-2: Appending value x 0 1 y to key 0
-2025/02/11 13:56:23 Operation called by PBClient-2 for Append key=0 val=x 0 1 y; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:23 I'm /var/tmp/824-1000/pb-15824-rcu-1
-2025/02/11 13:56:23 Forwarding to backup: /var/tmp/824-1000/pb-15824-rcu-3
-unexpected EOF
-2025/02/11 13:56:23 Operation called by /var/tmp/824-1000/pb-15824-rcu-1 for Append key=0 val=x 0 1 y; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-2
-2025/02/11 13:56:23 I'm /var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:23 Duplicate operation from PBClient-2
-2025/02/11 13:56:23 PBClient-2: Getting value for key 0
-2025/02/11 13:56:23 Operation called by PBClient-2 for Get key=0 val=; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:23 I'm /var/tmp/824-1000/pb-15824-rcu-1
-2025/02/11 13:56:23 Forwarding to backup: /var/tmp/824-1000/pb-15824-rcu-3
-read unix @->/var/tmp/824-1000/pb-15824-rcu-3: read: connection reset by peer
-unexpected EOF
-2025/02/11 13:56:23 Operation called by /var/tmp/824-1000/pb-15824-rcu-1 for Get key=0 val=; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-2
-2025/02/11 13:56:23 I'm /var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:23 Duplicate operation from PBClient-2
-2025/02/11 13:56:23 PBClient-2: Appending value x 0 2 y to key 0
-2025/02/11 13:56:23 Operation called by PBClient-2 for Append key=0 val=x 0 2 y; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:23 I'm /var/tmp/824-1000/pb-15824-rcu-1
-2025/02/11 13:56:23 Forwarding to backup: /var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:23 Operation called by /var/tmp/824-1000/pb-15824-rcu-1 for Append key=0 val=x 0 2 y; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-2
-2025/02/11 13:56:23 I'm /var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:23 PBClient-2: Getting value for key 0
-unexpected EOF
-2025/02/11 13:56:23 Operation called by PBClient-2 for Get key=0 val=; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:23 I'm /var/tmp/824-1000/pb-15824-rcu-1
-2025/02/11 13:56:23 Forwarding to backup: /var/tmp/824-1000/pb-15824-rcu-3
-read unix @->/var/tmp/824-1000/pb-15824-rcu-3: read: connection reset by peer
-2025/02/11 13:56:23 Operation called by /var/tmp/824-1000/pb-15824-rcu-1 for Get key=0 val=; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-2
-2025/02/11 13:56:23 I'm /var/tmp/824-1000/pb-15824-rcu-3
-No good!
-2025/02/11 13:56:23 Duplicate operation from PBClient-1
-2025/02/11 13:56:23 PBClient-1: Getting value for key 0
-2025/02/11 13:56:23 Operation called by PBClient-1 for Get key=0 val=; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:23 I'm /var/tmp/824-1000/pb-15824-rcu-1
-2025/02/11 13:56:23 Forwarding to backup: /var/tmp/824-1000/pb-15824-rcu-3
-unexpected EOF
-2025/02/11 13:56:23 Operation called by /var/tmp/824-1000/pb-15824-rcu-1 for Get key=0 val=; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-2
-2025/02/11 13:56:23 I'm /var/tmp/824-1000/pb-15824-rcu-3
-unexpected EOF
-unexpected EOF
-2025/02/11 13:56:23 Duplicate operation from PBClient-1
-2025/02/11 13:56:23 Duplicate operation from PBClient-1
-2025/02/11 13:56:23 Duplicate operation from PBClient-1
-2025/02/11 13:56:23 PBClient-1: Appending value x 1 2 y to key 0
-read unix @->/var/tmp/824-1000/pb-15824-rcu-1: read: connection reset by peer
-No good!
-2025/02/11 13:56:23 Duplicate operation from PBClient-2
-2025/02/11 13:56:23 PBClient-2: Appending value x 0 3 y to key 0
-2025/02/11 13:56:23 Operation called by PBClient-2 for Append key=0 val=x 0 3 y; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:23 I'm /var/tmp/824-1000/pb-15824-rcu-1
-2025/02/11 13:56:23 Forwarding to backup: /var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:23 Operation called by /var/tmp/824-1000/pb-15824-rcu-1 for Append key=0 val=x 0 3 y; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-2
-2025/02/11 13:56:23 I'm /var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:23 PBClient-2: Getting value for key 0
-2025/02/11 13:56:23 Operation called by PBClient-2 for Get key=0 val=; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:23 I'm /var/tmp/824-1000/pb-15824-rcu-1
-2025/02/11 13:56:23 Forwarding to backup: /var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:23 Operation called by /var/tmp/824-1000/pb-15824-rcu-1 for Get key=0 val=; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-2
-2025/02/11 13:56:23 I'm /var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:23 PBClient-2: Appending value x 0 4 y to key 0
-2025/02/11 13:56:23 Operation called by PBClient-2 for Append key=0 val=x 0 4 y; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:23 I'm /var/tmp/824-1000/pb-15824-rcu-1
-2025/02/11 13:56:23 Forwarding to backup: /var/tmp/824-1000/pb-15824-rcu-3
-unexpected EOF
-2025/02/11 13:56:23 Operation called by /var/tmp/824-1000/pb-15824-rcu-1 for Append key=0 val=x 0 4 y; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-2
-2025/02/11 13:56:23 I'm /var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:23 Duplicate operation from PBClient-2
-2025/02/11 13:56:23 PBClient-2: Getting value for key 0
-2025/02/11 13:56:23 Operation called by PBClient-2 for Get key=0 val=; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:23 I'm /var/tmp/824-1000/pb-15824-rcu-1
-2025/02/11 13:56:23 Forwarding to backup: /var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:23 Operation called by /var/tmp/824-1000/pb-15824-rcu-1 for Get key=0 val=; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-2
-2025/02/11 13:56:23 I'm /var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:23 PBClient-2: Appending value x 0 5 y to key 0
-unexpected EOF
-2025/02/11 13:56:23 Operation called by PBClient-2 for Append key=0 val=x 0 5 y; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:23 I'm /var/tmp/824-1000/pb-15824-rcu-1
-2025/02/11 13:56:23 Forwarding to backup: /var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:23 Operation called by /var/tmp/824-1000/pb-15824-rcu-1 for Append key=0 val=x 0 5 y; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-2
-2025/02/11 13:56:23 I'm /var/tmp/824-1000/pb-15824-rcu-3
-No good!
-2025/02/11 13:56:23 Operation called by PBClient-1 for Append key=0 val=x 1 2 y; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:23 I'm /var/tmp/824-1000/pb-15824-rcu-1
-2025/02/11 13:56:23 Forwarding to backup: /var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:23 Operation called by /var/tmp/824-1000/pb-15824-rcu-1 for Append key=0 val=x 1 2 y; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-2
-2025/02/11 13:56:23 I'm /var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:23 PBClient-1: Getting value for key 0
-2025/02/11 13:56:23 Operation called by PBClient-1 for Get key=0 val=; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:23 I'm /var/tmp/824-1000/pb-15824-rcu-1
-2025/02/11 13:56:23 Forwarding to backup: /var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:23 Operation called by /var/tmp/824-1000/pb-15824-rcu-1 for Get key=0 val=; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-2
-2025/02/11 13:56:23 I'm /var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:23 PBClient-1: Appending value x 1 3 y to key 0
-2025/02/11 13:56:23 Operation called by PBClient-1 for Append key=0 val=x 1 3 y; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:23 I'm /var/tmp/824-1000/pb-15824-rcu-1
-2025/02/11 13:56:23 Forwarding to backup: /var/tmp/824-1000/pb-15824-rcu-3
-unexpected EOF
-2025/02/11 13:56:23 Operation called by /var/tmp/824-1000/pb-15824-rcu-1 for Append key=0 val=x 1 3 y; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-2
-2025/02/11 13:56:23 I'm /var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:23 Duplicate operation from PBClient-1
-2025/02/11 13:56:23 PBClient-1: Getting value for key 0
-2025/02/11 13:56:23 Operation called by PBClient-1 for Get key=0 val=; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:23 I'm /var/tmp/824-1000/pb-15824-rcu-1
-2025/02/11 13:56:23 Forwarding to backup: /var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:23 Operation called by /var/tmp/824-1000/pb-15824-rcu-1 for Get key=0 val=; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-2
-2025/02/11 13:56:23 I'm /var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:23 PBClient-1: Appending value x 1 4 y to key 0
-unexpected EOF
-2025/02/11 13:56:23 Operation called by PBClient-1 for Append key=0 val=x 1 4 y; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:23 I'm /var/tmp/824-1000/pb-15824-rcu-1
-2025/02/11 13:56:23 Forwarding to backup: /var/tmp/824-1000/pb-15824-rcu-3
-read unix @->/var/tmp/824-1000/pb-15824-rcu-3: read: connection reset by peer
-2025/02/11 13:56:23 Operation called by /var/tmp/824-1000/pb-15824-rcu-1 for Append key=0 val=x 1 4 y; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-2
-2025/02/11 13:56:23 I'm /var/tmp/824-1000/pb-15824-rcu-3
-No good!
-2025/02/11 13:56:24 Duplicate operation from PBClient-2
-2025/02/11 13:56:24 PBClient-2: Getting value for key 0
-2025/02/11 13:56:24 Operation called by PBClient-2 for Get key=0 val=; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:24 I'm /var/tmp/824-1000/pb-15824-rcu-1
-2025/02/11 13:56:24 Forwarding to backup: /var/tmp/824-1000/pb-15824-rcu-3
-unexpected EOF
-2025/02/11 13:56:24 Operation called by /var/tmp/824-1000/pb-15824-rcu-1 for Get key=0 val=; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-2
-2025/02/11 13:56:24 I'm /var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:24 Duplicate operation from PBClient-2
-2025/02/11 13:56:24 PBClient-2: Appending value x 0 6 y to key 0
-unexpected EOF
-2025/02/11 13:56:24 Operation called by PBClient-2 for Append key=0 val=x 0 6 y; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:24 I'm /var/tmp/824-1000/pb-15824-rcu-1
-2025/02/11 13:56:24 Forwarding to backup: /var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:24 Operation called by /var/tmp/824-1000/pb-15824-rcu-1 for Append key=0 val=x 0 6 y; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-2
-2025/02/11 13:56:24 I'm /var/tmp/824-1000/pb-15824-rcu-3
-No good!
-2025/02/11 13:56:24 Duplicate operation from PBClient-1
-2025/02/11 13:56:24 PBClient-1: Getting value for key 0
-2025/02/11 13:56:24 Operation called by PBClient-1 for Get key=0 val=; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:24 I'm /var/tmp/824-1000/pb-15824-rcu-1
-2025/02/11 13:56:24 Forwarding to backup: /var/tmp/824-1000/pb-15824-rcu-3
-read unix @->/var/tmp/824-1000/pb-15824-rcu-3: read: connection reset by peer
-2025/02/11 13:56:24 Operation called by /var/tmp/824-1000/pb-15824-rcu-1 for Get key=0 val=; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-2
-2025/02/11 13:56:24 I'm /var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:24 PBClient-1: Appending value x 1 5 y to key 0
-2025/02/11 13:56:24 Operation called by PBClient-1 for Append key=0 val=x 1 5 y; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:24 I'm /var/tmp/824-1000/pb-15824-rcu-1
-2025/02/11 13:56:24 Forwarding to backup: /var/tmp/824-1000/pb-15824-rcu-3
-unexpected EOF
-2025/02/11 13:56:24 Operation called by /var/tmp/824-1000/pb-15824-rcu-1 for Append key=0 val=x 1 5 y; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-2
-2025/02/11 13:56:24 I'm /var/tmp/824-1000/pb-15824-rcu-3
-unexpected EOF
-2025/02/11 13:56:24 Duplicate operation from PBClient-1
-2025/02/11 13:56:24 Duplicate operation from PBClient-1
-2025/02/11 13:56:24 PBClient-1: Getting value for key 0
-unexpected EOF
-2025/02/11 13:56:24 Operation called by PBClient-1 for Get key=0 val=; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:24 I'm /var/tmp/824-1000/pb-15824-rcu-1
-2025/02/11 13:56:24 Forwarding to backup: /var/tmp/824-1000/pb-15824-rcu-3
-unexpected EOF
-2025/02/11 13:56:24 Operation called by /var/tmp/824-1000/pb-15824-rcu-1 for Get key=0 val=; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-2
-2025/02/11 13:56:24 I'm /var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:24 Duplicate operation from PBClient-1
-No good!
-2025/02/11 13:56:24 Duplicate operation from PBClient-2
-2025/02/11 13:56:24 PBClient-2: Getting value for key 0
-2025/02/11 13:56:24 Operation called by PBClient-2 for Get key=0 val=; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:24 I'm /var/tmp/824-1000/pb-15824-rcu-1
-2025/02/11 13:56:24 Forwarding to backup: /var/tmp/824-1000/pb-15824-rcu-3
-unexpected EOF
-2025/02/11 13:56:24 Operation called by /var/tmp/824-1000/pb-15824-rcu-1 for Get key=0 val=; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-2
-2025/02/11 13:56:24 I'm /var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:24 Duplicate operation from PBClient-2
-2025/02/11 13:56:24 PBClient-2: Appending value x 0 7 y to key 0
-2025/02/11 13:56:24 Operation called by PBClient-2 for Append key=0 val=x 0 7 y; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:24 I'm /var/tmp/824-1000/pb-15824-rcu-1
-2025/02/11 13:56:24 Forwarding to backup: /var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:24 Operation called by /var/tmp/824-1000/pb-15824-rcu-1 for Append key=0 val=x 0 7 y; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-2
-2025/02/11 13:56:24 I'm /var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:24 PBClient-2: Getting value for key 0
-unexpected EOF
-2025/02/11 13:56:24 Operation called by PBClient-2 for Get key=0 val=; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:24 I'm /var/tmp/824-1000/pb-15824-rcu-1
-2025/02/11 13:56:24 Forwarding to backup: /var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:24 Operation called by /var/tmp/824-1000/pb-15824-rcu-1 for Get key=0 val=; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-2
-2025/02/11 13:56:24 I'm /var/tmp/824-1000/pb-15824-rcu-3
-No good!
-2025/02/11 13:56:24 Duplicate operation from PBClient-1
-2025/02/11 13:56:24 PBClient-1: Appending value x 1 6 y to key 0
-2025/02/11 13:56:24 Operation called by PBClient-1 for Append key=0 val=x 1 6 y; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:24 I'm /var/tmp/824-1000/pb-15824-rcu-1
-2025/02/11 13:56:24 Forwarding to backup: /var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:24 Operation called by /var/tmp/824-1000/pb-15824-rcu-1 for Append key=0 val=x 1 6 y; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-2
-2025/02/11 13:56:24 I'm /var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:24 PBClient-1: Getting value for key 0
-2025/02/11 13:56:24 Operation called by PBClient-1 for Get key=0 val=; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:24 I'm /var/tmp/824-1000/pb-15824-rcu-1
-2025/02/11 13:56:24 Forwarding to backup: /var/tmp/824-1000/pb-15824-rcu-3
-unexpected EOF
-2025/02/11 13:56:24 Operation called by /var/tmp/824-1000/pb-15824-rcu-1 for Get key=0 val=; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-2
-2025/02/11 13:56:24 I'm /var/tmp/824-1000/pb-15824-rcu-3
-2025/02/11 13:56:24 Duplicate operation from PBClient-1
-2025/02/11 13:56:24 PBClient-1: Appending value x 1 7 y to key 0
-read unix @->/var/tmp/824-1000/pb-15824-rcu-1: read: connection reset by peer
-No good!
-Killing pbserver /var/tmp/824-1000/pb-15824-rcu-1
-No good!
+Test: Single primary, no backup ...
+2025/02/12 09:34:39 Received tick
+ping from /var/tmp/824-1000/pb-9911-basic-1
+2025/02/12 09:34:39 Current view:  {1 /var/tmp/824-1000/pb-9911-basic-1 }
+2025/02/12 09:34:39 Received tick
+ping from /var/tmp/824-1000/pb-9911-basic-1
+2025/02/12 09:34:39 Current view:  {1 /var/tmp/824-1000/pb-9911-basic-1 }
+2025/02/12 09:34:40 Received tick
+ping from /var/tmp/824-1000/pb-9911-basic-1
+2025/02/12 09:34:40 Current view:  {1 /var/tmp/824-1000/pb-9911-basic-1 }
+2025/02/12 09:34:40 Received tick
+ping from /var/tmp/824-1000/pb-9911-basic-1
+2025/02/12 09:34:40 Current view:  {1 /var/tmp/824-1000/pb-9911-basic-1 }
+2025/02/12 09:34:40 Received tick
+ping from /var/tmp/824-1000/pb-9911-basic-1
+2025/02/12 09:34:40 Current view:  {1 /var/tmp/824-1000/pb-9911-basic-1 }
+2025/02/12 09:34:40 Received tick
+ping from /var/tmp/824-1000/pb-9911-basic-1
+2025/02/12 09:34:40 Current view:  {1 /var/tmp/824-1000/pb-9911-basic-1 }
+2025/02/12 09:34:40 Received tick
+ping from /var/tmp/824-1000/pb-9911-basic-1
+2025/02/12 09:34:40 Current view:  {1 /var/tmp/824-1000/pb-9911-basic-1 }
+2025/02/12 09:34:40 Received tick
+ping from /var/tmp/824-1000/pb-9911-basic-1
+2025/02/12 09:34:40 Current view:  {1 /var/tmp/824-1000/pb-9911-basic-1 }
+2025/02/12 09:34:40 Received tick
+ping from /var/tmp/824-1000/pb-9911-basic-1
+2025/02/12 09:34:40 Current view:  {1 /var/tmp/824-1000/pb-9911-basic-1 }
+2025/02/12 09:34:40 Received tick
+ping from /var/tmp/824-1000/pb-9911-basic-1
+2025/02/12 09:34:40 Current view:  {1 /var/tmp/824-1000/pb-9911-basic-1 }
+2025/02/12 09:34:40 PBClient-1: Putting value v1 for key 111
+2025/02/12 09:34:40 Received tick
+ping from /var/tmp/824-1000/pb-9911-basic-1
+2025/02/12 09:34:40 Current view:  {1 /var/tmp/824-1000/pb-9911-basic-1 }
+2025/02/12 09:34:40 Operation called by PBClient-1 for Put key=111 val=v1; current P=/var/tmp/824-1000/pb-9911-basic-1 B=
+2025/02/12 09:34:40 I'm /var/tmp/824-1000/pb-9911-basic-1
+2025/02/12 09:34:40 Current view:  {1 /var/tmp/824-1000/pb-9911-basic-1 }
+2025/02/12 09:34:40 PBClient-1: Getting value for key 111
+2025/02/12 09:34:40 Operation called by PBClient-1 for Get key=111 val=; current P=/var/tmp/824-1000/pb-9911-basic-1 B=
+2025/02/12 09:34:40 I'm /var/tmp/824-1000/pb-9911-basic-1
+2025/02/12 09:34:40 Current view:  {1 /var/tmp/824-1000/pb-9911-basic-1 }
+2025/02/12 09:34:40 PBClient-1: Putting value v2 for key 2
+2025/02/12 09:34:40 Operation called by PBClient-1 for Put key=2 val=v2; current P=/var/tmp/824-1000/pb-9911-basic-1 B=
+2025/02/12 09:34:40 I'm /var/tmp/824-1000/pb-9911-basic-1
+2025/02/12 09:34:40 Current view:  {1 /var/tmp/824-1000/pb-9911-basic-1 }
+2025/02/12 09:34:40 PBClient-1: Getting value for key 2
+2025/02/12 09:34:40 Operation called by PBClient-1 for Get key=2 val=; current P=/var/tmp/824-1000/pb-9911-basic-1 B=
+2025/02/12 09:34:40 I'm /var/tmp/824-1000/pb-9911-basic-1
+2025/02/12 09:34:40 Current view:  {1 /var/tmp/824-1000/pb-9911-basic-1 }
+2025/02/12 09:34:40 PBClient-1: Putting value v1a for key 1
+2025/02/12 09:34:40 Operation called by PBClient-1 for Put key=1 val=v1a; current P=/var/tmp/824-1000/pb-9911-basic-1 B=
+2025/02/12 09:34:40 I'm /var/tmp/824-1000/pb-9911-basic-1
+2025/02/12 09:34:40 Current view:  {1 /var/tmp/824-1000/pb-9911-basic-1 }
+2025/02/12 09:34:40 PBClient-1: Getting value for key 1
+2025/02/12 09:34:40 Operation called by PBClient-1 for Get key=1 val=; current P=/var/tmp/824-1000/pb-9911-basic-1 B=
+2025/02/12 09:34:40 I'm /var/tmp/824-1000/pb-9911-basic-1
+2025/02/12 09:34:40 Current view:  {1 /var/tmp/824-1000/pb-9911-basic-1 }
+2025/02/12 09:34:40 PBClient-1: Appending value hello to key ak
+2025/02/12 09:34:40 Operation called by PBClient-1 for Append key=ak val=hello; current P=/var/tmp/824-1000/pb-9911-basic-1 B=
+2025/02/12 09:34:40 I'm /var/tmp/824-1000/pb-9911-basic-1
+2025/02/12 09:34:40 Current view:  {1 /var/tmp/824-1000/pb-9911-basic-1 }
+2025/02/12 09:34:40 PBClient-1: Getting value for key ak
+2025/02/12 09:34:40 Operation called by PBClient-1 for Get key=ak val=; current P=/var/tmp/824-1000/pb-9911-basic-1 B=
+2025/02/12 09:34:40 I'm /var/tmp/824-1000/pb-9911-basic-1
+2025/02/12 09:34:40 Current view:  {1 /var/tmp/824-1000/pb-9911-basic-1 }
+2025/02/12 09:34:40 PBClient-1: Putting value xx for key ak
+2025/02/12 09:34:40 Operation called by PBClient-1 for Put key=ak val=xx; current P=/var/tmp/824-1000/pb-9911-basic-1 B=
+2025/02/12 09:34:40 I'm /var/tmp/824-1000/pb-9911-basic-1
+2025/02/12 09:34:40 Current view:  {1 /var/tmp/824-1000/pb-9911-basic-1 }
+2025/02/12 09:34:40 PBClient-1: Appending value yy to key ak
+2025/02/12 09:34:40 Operation called by PBClient-1 for Append key=ak val=yy; current P=/var/tmp/824-1000/pb-9911-basic-1 B=
+2025/02/12 09:34:40 I'm /var/tmp/824-1000/pb-9911-basic-1
+2025/02/12 09:34:40 Current view:  {1 /var/tmp/824-1000/pb-9911-basic-1 }
+2025/02/12 09:34:40 PBClient-1: Getting value for key ak
+2025/02/12 09:34:40 Operation called by PBClient-1 for Get key=ak val=; current P=/var/tmp/824-1000/pb-9911-basic-1 B=
+2025/02/12 09:34:40 I'm /var/tmp/824-1000/pb-9911-basic-1
+2025/02/12 09:34:40 Current view:  {1 /var/tmp/824-1000/pb-9911-basic-1 }
+  ... Passed
+Test: Add a backup ...
+2025/02/12 09:34:40 Received tick
+ping from /var/tmp/824-1000/pb-9911-basic-2
+2025/02/12 09:34:40 Current view:  {2 /var/tmp/824-1000/pb-9911-basic-1 /var/tmp/824-1000/pb-9911-basic-2}
+2025/02/12 09:34:40 Received tick
+ping from /var/tmp/824-1000/pb-9911-basic-1
+2025/02/12 09:34:41 Received tick
+ping from /var/tmp/824-1000/pb-9911-basic-2
+Hello C
+Hello D
+Hello E
+2025/02/12 09:34:41 PBClient-1: Putting value 33 for key 3
+2025/02/12 09:34:41 Current view:  {2 /var/tmp/824-1000/pb-9911-basic-1 /var/tmp/824-1000/pb-9911-basic-2}
+2025/02/12 09:34:41 Received tick
+ping from /var/tmp/824-1000/pb-9911-basic-2
+2025/02/12 09:34:41 Current view:  {2 /var/tmp/824-1000/pb-9911-basic-1 /var/tmp/824-1000/pb-9911-basic-2}
+2025/02/12 09:34:41 Received tick
+ping from /var/tmp/824-1000/pb-9911-basic-2
+2025/02/12 09:34:41 Current view:  {2 /var/tmp/824-1000/pb-9911-basic-1 /var/tmp/824-1000/pb-9911-basic-2}
+2025/02/12 09:34:41 Received tick
+ping from /var/tmp/824-1000/pb-9911-basic-2
+2025/02/12 09:34:41 Current view:  {2 /var/tmp/824-1000/pb-9911-basic-1 /var/tmp/824-1000/pb-9911-basic-2}
+No good!
+2025/02/12 09:34:41 Received tick
+ping from /var/tmp/824-1000/pb-9911-basic-2
+2025/02/12 09:34:41 Current view:  {2 /var/tmp/824-1000/pb-9911-basic-1 /var/tmp/824-1000/pb-9911-basic-2}
+No good!
+2025/02/12 09:34:41 Received tick
+ping from /var/tmp/824-1000/pb-9911-basic-2
+2025/02/12 09:34:41 Current view:  {2 /var/tmp/824-1000/pb-9911-basic-1 /var/tmp/824-1000/pb-9911-basic-2}
+No good!
+2025/02/12 09:34:41 Received tick
+ping from /var/tmp/824-1000/pb-9911-basic-2
+2025/02/12 09:34:41 Current view:  {2 /var/tmp/824-1000/pb-9911-basic-1 /var/tmp/824-1000/pb-9911-basic-2}
+No good!
+2025/02/12 09:34:41 Received tick
+ping from /var/tmp/824-1000/pb-9911-basic-2
+2025/02/12 09:34:41 Current view:  {2 /var/tmp/824-1000/pb-9911-basic-1 /var/tmp/824-1000/pb-9911-basic-2}
+No good!
+2025/02/12 09:34:41 Received tick
+ping from /var/tmp/824-1000/pb-9911-basic-2
+2025/02/12 09:34:41 Current view:  {2 /var/tmp/824-1000/pb-9911-basic-1 /var/tmp/824-1000/pb-9911-basic-2}
+No good!
+2025/02/12 09:34:41 Received tick
+ping from /var/tmp/824-1000/pb-9911-basic-2
+2025/02/12 09:34:41 Current view:  {2 /var/tmp/824-1000/pb-9911-basic-1 /var/tmp/824-1000/pb-9911-basic-2}
+No good!
+2025/02/12 09:34:42 Received tick
+ping from /var/tmp/824-1000/pb-9911-basic-2
+2025/02/12 09:34:42 Current view:  {2 /var/tmp/824-1000/pb-9911-basic-1 /var/tmp/824-1000/pb-9911-basic-2}
+No good!
+2025/02/12 09:34:42 Received tick
+ping from /var/tmp/824-1000/pb-9911-basic-2
+2025/02/12 09:34:42 Current view:  {2 /var/tmp/824-1000/pb-9911-basic-1 /var/tmp/824-1000/pb-9911-basic-2}
+No good!
+2025/02/12 09:34:42 Received tick
+ping from /var/tmp/824-1000/pb-9911-basic-2
+2025/02/12 09:34:42 Current view:  {2 /var/tmp/824-1000/pb-9911-basic-1 /var/tmp/824-1000/pb-9911-basic-2}
 No good!
+2025/02/12 09:34:42 Received tick
+ping from /var/tmp/824-1000/pb-9911-basic-2
+2025/02/12 09:34:42 Current view:  {2 /var/tmp/824-1000/pb-9911-basic-1 /var/tmp/824-1000/pb-9911-basic-2}
 No good!
+2025/02/12 09:34:42 Received tick
+ping from /var/tmp/824-1000/pb-9911-basic-2
+2025/02/12 09:34:42 Current view:  {2 /var/tmp/824-1000/pb-9911-basic-1 /var/tmp/824-1000/pb-9911-basic-2}
 No good!
+2025/02/12 09:34:42 Received tick
+ping from /var/tmp/824-1000/pb-9911-basic-2
+2025/02/12 09:34:42 Current view:  {2 /var/tmp/824-1000/pb-9911-basic-1 /var/tmp/824-1000/pb-9911-basic-2}
 No good!
+2025/02/12 09:34:42 Received tick
+ping from /var/tmp/824-1000/pb-9911-basic-2
+2025/02/12 09:34:42 Current view:  {2 /var/tmp/824-1000/pb-9911-basic-1 /var/tmp/824-1000/pb-9911-basic-2}
 No good!
+2025/02/12 09:34:42 Received tick
+ping from /var/tmp/824-1000/pb-9911-basic-2
+2025/02/12 09:34:42 Current view:  {2 /var/tmp/824-1000/pb-9911-basic-1 /var/tmp/824-1000/pb-9911-basic-2}
 No good!
+2025/02/12 09:34:42 Received tick
+ping from /var/tmp/824-1000/pb-9911-basic-2
+2025/02/12 09:34:42 Current view:  {2 /var/tmp/824-1000/pb-9911-basic-1 /var/tmp/824-1000/pb-9911-basic-2}
 No good!
+2025/02/12 09:34:42 Received tick
+ping from /var/tmp/824-1000/pb-9911-basic-2
+2025/02/12 09:34:42 Current view:  {2 /var/tmp/824-1000/pb-9911-basic-1 /var/tmp/824-1000/pb-9911-basic-2}
 No good!
+2025/02/12 09:34:43 Received tick
+ping from /var/tmp/824-1000/pb-9911-basic-2
+2025/02/12 09:34:43 Current view:  {2 /var/tmp/824-1000/pb-9911-basic-1 /var/tmp/824-1000/pb-9911-basic-2}
 No good!
+2025/02/12 09:34:43 Received tick
+ping from /var/tmp/824-1000/pb-9911-basic-2
+2025/02/12 09:34:43 Current view:  {2 /var/tmp/824-1000/pb-9911-basic-1 /var/tmp/824-1000/pb-9911-basic-2}
 No good!
-2025/02/11 13:56:25 Operation called by PBClient-2 for Get key=0 val=; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-2
-2025/02/11 13:56:25 I'm /var/tmp/824-1000/pb-15824-rcu-1
-2025/02/11 13:56:25 Forwarding to backup: /var/tmp/824-1000/pb-15824-rcu-2
-2025/02/11 13:56:25 Operation called by /var/tmp/824-1000/pb-15824-rcu-1 for Get key=0 val=; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-2
-2025/02/11 13:56:25 I'm /var/tmp/824-1000/pb-15824-rcu-2
-unexpected EOF
-2025/02/11 13:56:25 Operation called by PBClient-1 for Append key=0 val=x 1 7 y; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-2
-2025/02/11 13:56:25 I'm /var/tmp/824-1000/pb-15824-rcu-1
-2025/02/11 13:56:25 Forwarding to backup: /var/tmp/824-1000/pb-15824-rcu-2
-2025/02/11 13:56:25 Operation called by /var/tmp/824-1000/pb-15824-rcu-1 for Append key=0 val=x 1 7 y; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-2
-2025/02/11 13:56:25 I'm /var/tmp/824-1000/pb-15824-rcu-2
-unexpected EOF
-2025/02/11 13:56:25 Duplicate operation from PBClient-1
-2025/02/11 13:56:25 Duplicate operation from PBClient-1
-2025/02/11 13:56:25 PBClient-1: Getting value for key 0
-2025/02/11 13:56:25 Operation called by PBClient-1 for Get key=0 val=; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-2
-2025/02/11 13:56:25 I'm /var/tmp/824-1000/pb-15824-rcu-1
-2025/02/11 13:56:25 Forwarding to backup: /var/tmp/824-1000/pb-15824-rcu-2
-2025/02/11 13:56:25 Operation called by /var/tmp/824-1000/pb-15824-rcu-1 for Get key=0 val=; current P=/var/tmp/824-1000/pb-15824-rcu-1 B=/var/tmp/824-1000/pb-15824-rcu-2
-2025/02/11 13:56:25 I'm /var/tmp/824-1000/pb-15824-rcu-2
-Killing pbserver /var/tmp/824-1000/pb-15824-rcu-1
-2025/02/11 13:56:26 Promoting backup to primary:  /var/tmp/824-1000/pb-15824-rcu-2
-/var/tmp/824-1000/pb-15824-rcu-2
-true
-/var/tmp/824-1000/pb-15824-rcu-1
-false
-/var/tmp/824-1000/pb-15824-rcu-3
-true
-Killing pbserver /var/tmp/824-1000/pb-15824-rcu-2
-2025/02/11 13:56:28 Promoting backup to primary:  /var/tmp/824-1000/pb-15824-rcu-3
-/var/tmp/824-1000/pb-15824-rcu-1
-true
-Killing pbserver /var/tmp/824-1000/pb-15824-rcu-1
-2025/02/11 13:56:30 sendPush received
-2025/02/11 13:56:30 Push: primary=/var/tmp/824-1000/pb-15824-rcu-3, backup=/var/tmp/824-1000/pb-15824-rcu-2
-2025/02/11 13:56:30 
-2025/02/11 13:56:30 Push received
-2025/02/11 13:56:30 Pulling on backup
-2025/02/11 13:56:30 
+2025/02/12 09:34:43 Received tick
+ping from /var/tmp/824-1000/pb-9911-basic-2
+2025/02/12 09:34:43 Current view:  {2 /var/tmp/824-1000/pb-9911-basic-1 /var/tmp/824-1000/pb-9911-basic-2}
 No good!
+2025/02/12 09:34:43 Received tick
+ping from /var/tmp/824-1000/pb-9911-basic-2
+2025/02/12 09:34:43 Current view:  {2 /var/tmp/824-1000/pb-9911-basic-1 /var/tmp/824-1000/pb-9911-basic-2}
 No good!
+2025/02/12 09:34:43 Received tick
+ping from /var/tmp/824-1000/pb-9911-basic-2
+2025/02/12 09:34:43 Current view:  {2 /var/tmp/824-1000/pb-9911-basic-1 /var/tmp/824-1000/pb-9911-basic-2}
 No good!
+2025/02/12 09:34:43 Received tick
+ping from /var/tmp/824-1000/pb-9911-basic-2
+2025/02/12 09:34:43 Current view:  {2 /var/tmp/824-1000/pb-9911-basic-1 /var/tmp/824-1000/pb-9911-basic-2}
 No good!
+2025/02/12 09:34:43 Received tick
+ping from /var/tmp/824-1000/pb-9911-basic-2
+2025/02/12 09:34:43 Current view:  {2 /var/tmp/824-1000/pb-9911-basic-1 /var/tmp/824-1000/pb-9911-basic-2}
 No good!
+2025/02/12 09:34:43 Received tick
+ping from /var/tmp/824-1000/pb-9911-basic-2
+2025/02/12 09:34:43 Current view:  {2 /var/tmp/824-1000/pb-9911-basic-1 /var/tmp/824-1000/pb-9911-basic-2}
 No good!
+2025/02/12 09:34:43 Received tick
+ping from /var/tmp/824-1000/pb-9911-basic-2
+2025/02/12 09:34:43 Current view:  {2 /var/tmp/824-1000/pb-9911-basic-1 /var/tmp/824-1000/pb-9911-basic-2}
 No good!
+2025/02/12 09:34:44 Received tick
+ping from /var/tmp/824-1000/pb-9911-basic-2
+2025/02/12 09:34:44 Current view:  {2 /var/tmp/824-1000/pb-9911-basic-1 /var/tmp/824-1000/pb-9911-basic-2}
 No good!
+2025/02/12 09:34:44 Received tick
+ping from /var/tmp/824-1000/pb-9911-basic-2
+2025/02/12 09:34:44 Current view:  {2 /var/tmp/824-1000/pb-9911-basic-1 /var/tmp/824-1000/pb-9911-basic-2}
 No good!
+2025/02/12 09:34:44 Received tick
+ping from /var/tmp/824-1000/pb-9911-basic-2
+2025/02/12 09:34:44 Current view:  {2 /var/tmp/824-1000/pb-9911-basic-1 /var/tmp/824-1000/pb-9911-basic-2}
 No good!
+2025/02/12 09:34:44 Received tick
+ping from /var/tmp/824-1000/pb-9911-basic-2
+2025/02/12 09:34:44 Current view:  {2 /var/tmp/824-1000/pb-9911-basic-1 /var/tmp/824-1000/pb-9911-basic-2}
 No good!
+2025/02/12 09:34:44 Received tick
+ping from /var/tmp/824-1000/pb-9911-basic-2
+2025/02/12 09:34:44 Current view:  {2 /var/tmp/824-1000/pb-9911-basic-1 /var/tmp/824-1000/pb-9911-basic-2}
 No good!
-Killing pbserver /var/tmp/824-1000/pb-15824-rcu-2
+2025/02/12 09:34:44 Received tick
+ping from /var/tmp/824-1000/pb-9911-basic-2
+2025/02/12 09:34:44 Current view:  {2 /var/tmp/824-1000/pb-9911-basic-1 /var/tmp/824-1000/pb-9911-basic-2}
 No good!
+2025/02/12 09:34:44 Received tick
+ping from /var/tmp/824-1000/pb-9911-basic-2
+2025/02/12 09:34:44 Current view:  {2 /var/tmp/824-1000/pb-9911-basic-1 /var/tmp/824-1000/pb-9911-basic-2}
 No good!
+2025/02/12 09:34:44 Received tick
+ping from /var/tmp/824-1000/pb-9911-basic-2
+2025/02/12 09:34:44 Current view:  {2 /var/tmp/824-1000/pb-9911-basic-1 /var/tmp/824-1000/pb-9911-basic-2}
 No good!
-No good!
-No good!
-No good!
-No good!
-No good!
-No good!
-No good!
-No good!
-No good!
-No good!
-No good!
-No good!
-No good!
-No good!
-No good!
-No good!
-No good!
-Killing pbserver /var/tmp/824-1000/pb-15824-rcu-2
-No good!
-No good!
-No good!
-No good!
-No good!
-No good!
-No good!
-No good!
-No good!
-No good!
-No good!
-No good!
-No good!
-No good!
-No good!
-No good!
-No good!
-No good!
-No good!
-No good!
-Killing pbserver /var/tmp/824-1000/pb-15824-rcu-3
-No good!
-No good!
-No good!
-No good!
-No good!
-No good!
-No good!
-No good!
-No good!
-No good!
-No good!
-Killing pbserver /var/tmp/824-1000/pb-15824-rcu-2
-Killing pbserver /var/tmp/824-1000/pb-15824-rcu-2
-  ... Appends done ... 
---- FAIL: TestRepeatedCrashUnreliable (21.60s)
-    pbservice_test.go:1163: previous value x 1 0 yx 1 1 yx 0 0 yx 0 1 yx 0 2 yx 0 3 yx 0 4 yx 0 5 yx 1 2 yx 1 3 yx 1 4 yx 0 6 yx 1 5 y is not a prefix of latest value 
-    pbservice_test.go:1163: previous value x 1 0 yx 1 1 yx 0 0 yx 0 1 yx 0 2 yx 0 3 yx 0 4 yx 0 5 yx 1 2 yx 1 3 yx 1 4 yx 0 6 yx 1 5 yx 0 7 yx 1 6 y is not a prefix of latest value x 1 7 y
-    pbservice_test.go:1186: child failed
-FAIL
-exit status 1
-FAIL	umich.edu/eecs491/proj2/pbservice	21.608s
+signal: interrupt
+FAIL	umich.edu/eecs491/proj2/pbservice	5.926s

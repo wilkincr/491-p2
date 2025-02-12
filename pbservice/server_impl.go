@@ -12,6 +12,7 @@ type PBServerImpl struct {
 	// channels for the goroutine
 	operator      chan OpArgs
 	replier       chan OpReply
+	ticker        chan interface{}
 	sendPusher    chan interface{}
 	pushReplier   chan PushReply
 	receivePusher chan PushArgs
@@ -21,6 +22,10 @@ type PBServerImpl struct {
 func (impl *PBServerImpl) doOperation(args OpArgs) OpReply {
 	impl.operator <- args
 	return <-impl.replier
+}
+
+func (impl *PBServerImpl) doTick() {
+	impl.ticker <- struct{}{}
 }
 
 func (impl *PBServerImpl) sendPush() PushReply {
@@ -36,11 +41,13 @@ func (impl *PBServerImpl) receivePush(args PushArgs) {
 func (pb *PBServer) initImpl() {
 	// Create channels
 	pb.impl.operator = make(chan OpArgs)
+	pb.impl.ticker = make(chan interface{})
 	pb.impl.replier = make(chan OpReply)
 	pb.impl.sendPusher = make(chan interface{})
 	pb.impl.pushReplier = make(chan PushReply)
 	pb.impl.receivePusher = make(chan PushArgs)
 	pb.impl.end = make(chan interface{})
+	pb.impl.currentView = viewservice.View{}
 
 	// Start the goroutine
 	go func() {
@@ -64,6 +71,7 @@ func (pb *PBServer) initImpl() {
 					args.Source, args.Op, args.Key, args.Value,
 					pb.impl.currentView.Primary, pb.impl.currentView.Backup)
 				log.Println("I'm", pb.me)
+				log.Println("Current view: ", pb.impl.currentView)
 
 				// 2) Possibly forward to backup
 				var forwardReply OpReply
@@ -71,28 +79,21 @@ func (pb *PBServer) initImpl() {
 					log.Println("Forwarding to backup:", pb.impl.currentView.Backup)
 					fargs := args
 					fargs.Source = pb.me
-					// Force retry until success
-					for {
-						ok := call(pb.impl.currentView.Backup, "PBServer.Operation", fargs, &forwardReply)
-						// Forward successful, break out of loop
-						if ok {
-							break
-						}
-						// Able to make connection with backup, but backup identifies split brain
-						if forwardReply.Err == ErrWrongServer {
-							reply.Err = ErrWrongServer
-							pb.impl.replier <- reply
-							continue
-						}
 
+					ok := call(pb.impl.currentView.Backup, "PBServer.Operation", fargs, &forwardReply)
+
+					// Requeue in case of failure
+					if !ok {
+						break
 					}
-				}
 
-				// 3) Check if error from forwarding
-				if forwardReply.Err == ErrWrongServer || pb.WrongServerOp(args) {
-					reply.Err = ErrWrongServer
-					pb.impl.replier <- reply
-					continue
+					// 3) Check if error from forwarding
+					if forwardReply.Err == ErrWrongServer || pb.WrongServerOp(args) {
+						reply.Err = ErrWrongServer
+						pb.impl.replier <- reply
+						continue
+					}
+
 				}
 
 				// 4) Actually apply the operation locally
@@ -113,7 +114,20 @@ func (pb *PBServer) initImpl() {
 
 				// 5) Return final reply
 				pb.impl.replier <- reply
-
+			case <-pb.impl.ticker:
+				log.Println("Received tick")
+				latestView, err := pb.vs.Ping(pb.impl.currentView.Viewnum)
+				if err != nil {
+					log.Println("Ping error", err)
+					return
+				}
+				if pb.NeedPush(latestView) {
+					pb.impl.currentView = latestView
+					pb.impl.sendPush()
+				} else {
+					pb.impl.currentView = latestView
+				}
+				log.Println("Current view: ", pb.impl.currentView)
 			case <-pb.impl.sendPusher:
 				// Pushing logic remains the same
 				pargs := PushArgs{
@@ -197,15 +211,5 @@ func (pb *PBServer) NeedPush(latestView viewservice.View) bool {
 // }
 
 func (pb *PBServer) tick() {
-	latestView, err := pb.vs.Ping(pb.impl.currentView.Viewnum)
-	if err != nil {
-		return
-	}
-	if pb.NeedPush(latestView) {
-		pb.impl.currentView = latestView
-		pb.impl.sendPush()
-	} else {
-		pb.impl.currentView = latestView
-	}
-
+	pb.impl.doTick()
 }

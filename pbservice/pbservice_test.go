@@ -89,19 +89,27 @@ func TestBasicFail(t *testing.T) {
 		}
 		time.Sleep(viewservice.PingInterval)
 	}
+	fmt.Println("Hello C")
 	v, _ := vck.Get()
+	fmt.Println("Hello D")
+
 	if v.Backup != s2.me {
 		t.Fatal("backup never came up")
 	}
 
+	fmt.Println("Hello E")
 	ck.Put("3", "33")
+	fmt.Println("Hello F")
 	check(t, ck, "3", "33")
 
 	// give the backup time to initialize
 	time.Sleep(3 * viewservice.PingInterval)
 
+	fmt.Println("Hello G")
 	ck.Put("4", "44")
+	fmt.Printf("Hello A")
 	check(t, ck, "4", "44")
+	fmt.Printf("Hello B")
 
 	fmt.Printf("  ... Passed\n")
 
