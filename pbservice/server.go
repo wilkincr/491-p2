@@ -17,12 +17,12 @@ import (
 type PBServer struct {
 	//mu         sync.Mutex
 	l          net.Listener
-	dead       <-chan interface {} // for testing
-	unreliable int32 // for testing
+	dead       <-chan interface{} // for testing
+	unreliable int32              // for testing
 	me         string
 	vs         *viewservice.Clerk
 
-	impl       PBServerImpl
+	impl PBServerImpl
 }
 
 // tell the server to shut itself down.
@@ -74,6 +74,7 @@ func StartServer(vshost string, me string, term <-chan interface{}) *PBServer {
 
 	go func() {
 		for pb.isdead() == false {
+			// log.Println("not dead, listening on ", pb.me)
 			conn, err := pb.l.Accept()
 			// We may have been killed while waiting for a new request
 			if pb.isdead() {
@@ -110,6 +111,7 @@ func StartServer(vshost string, me string, term <-chan interface{}) *PBServer {
 
 	go func() {
 		for pb.isdead() == false {
+			log.Println("Ticking on", pb.me)
 			pb.tick()
 			time.Sleep(viewservice.PingInterval)
 		}

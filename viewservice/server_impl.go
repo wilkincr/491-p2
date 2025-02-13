@@ -7,9 +7,12 @@ import (
 
 // additions to ViewServer state.
 type ViewServerImpl struct {
-	currentView  View
-	proxyMap     map[string]*ServerProxy
+	currentView View
+	// proxyMap     map[string]*ServerProxy
 	primaryAcked bool
+	adder        chan string
+	resetter     chan string
+	current      chan map[string]*ServerProxy
 }
 
 type ServerProxy struct {
@@ -23,8 +26,38 @@ func (vs *ViewServer) initImpl() {
 	vs.impl.currentView.Viewnum = 0
 	vs.impl.currentView.Primary = ""
 	vs.impl.currentView.Backup = ""
-	vs.impl.proxyMap = make(map[string]*ServerProxy)
 	vs.impl.primaryAcked = false
+	vs.impl.adder = make(chan string)
+	vs.impl.resetter = make(chan string)
+	vs.impl.current = make(chan map[string]*ServerProxy)
+
+	go func() {
+		proxymap := make(map[string]*ServerProxy)
+		for {
+			select {
+			case clientAddr := <-vs.impl.adder:
+				if _, exists := proxymap[clientAddr]; !exists {
+					proxymap[clientAddr] = &ServerProxy{ID: clientAddr, alive: true, missedHeartbeats: 0}
+				}
+			case clientAddr := <-vs.impl.resetter:
+				proxymap[clientAddr].missedHeartbeats = 0
+				proxymap[clientAddr].alive = true
+			case vs.impl.current <- proxymap:
+			}
+		}
+	}()
+}
+
+func (vs *ViewServer) add(clientAddr string) {
+	vs.impl.adder <- clientAddr
+}
+
+func (vs *ViewServer) reset(clientAddr string) {
+	vs.impl.resetter <- clientAddr
+}
+
+func (vs *ViewServer) get() map[string]*ServerProxy {
+	return <-vs.impl.current
 }
 
 func (vs *ViewServer) IncrementView() {
@@ -49,10 +82,8 @@ func (vs *ViewServer) PingImpl(args *PingArgs, reply *PingReply) error {
 	clientAddr := args.Me
 	clientViewnum := args.Viewnum
 	// fmt.Println("ping from", clientAddr)
-	// Checking for new client
-	if _, exists := vs.impl.proxyMap[clientAddr]; !exists {
-		vs.impl.proxyMap[clientAddr] = &ServerProxy{ID: clientAddr, alive: true, missedHeartbeats: 0}
-	}
+	// Checking for new client, only adds if doesn't exist
+	vs.add(clientAddr)
 	// First ping, add primary
 	if vs.impl.currentView.Viewnum == 0 {
 		// Add primary
@@ -74,8 +105,7 @@ func (vs *ViewServer) PingImpl(args *PingArgs, reply *PingReply) error {
 	}
 
 	reply.View = vs.impl.currentView
-	vs.impl.proxyMap[clientAddr].missedHeartbeats = 0
-	vs.impl.proxyMap[clientAddr].alive = true
+	vs.reset(clientAddr)
 	return nil
 }
 
@@ -99,7 +129,7 @@ func (vs *ViewServer) handleFailure(proxyID string) {
 	if proxyID == vs.impl.currentView.Primary {
 		// Check if old primary hasn't acked
 		if !vs.impl.primaryAcked {
-			fmt.Println("No good!")
+			fmt.Println("Old primary hasn't acked")
 			return
 		}
 		// Safe to promote backup to primary
@@ -108,7 +138,7 @@ func (vs *ViewServer) handleFailure(proxyID string) {
 		// No backup (for now)
 		vs.impl.currentView.Backup = ""
 		// Check for available idle servers
-		for _, proxy := range vs.impl.proxyMap {
+		for _, proxy := range <-vs.impl.current {
 			fmt.Println(proxy.ID)
 			fmt.Println(proxy.alive)
 			if vs.idleAvailable(proxy) {
@@ -122,7 +152,7 @@ func (vs *ViewServer) handleFailure(proxyID string) {
 		// Backup failed, no backup (for now)
 		vs.impl.currentView.Backup = ""
 		// Check for available idle servers
-		for _, proxy := range vs.impl.proxyMap {
+		for _, proxy := range vs.get() {
 			if vs.idleAvailable(proxy) {
 				// Promote idle to backup
 				vs.impl.currentView.Backup = proxy.ID
@@ -138,7 +168,7 @@ func (vs *ViewServer) handleFailure(proxyID string) {
 // if servers have died or recovered, and change the view
 // accordingly.
 func (vs *ViewServer) tick() {
-	for _, proxy := range vs.impl.proxyMap {
+	for _, proxy := range vs.get() {
 		if proxy.missedHeartbeats < DeadPings {
 			proxy.missedHeartbeats++
 		}

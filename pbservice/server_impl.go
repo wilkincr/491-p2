@@ -10,164 +10,205 @@ import (
 type PBServerImpl struct {
 	currentView viewservice.View
 	// channels for the goroutine
-	operator      chan OpArgs
-	replier       chan OpReply
-	ticker        chan interface{}
-	sendPusher    chan interface{}
-	pushReplier   chan PushReply
-	receivePusher chan PushArgs
-	end           chan interface{}
+	operator chan Operation
+	ticker   chan struct{}
+	pusher   chan Push
+	end      chan interface{}
 }
 
-func (impl *PBServerImpl) doOperation(args OpArgs) OpReply {
-	impl.operator <- args
-	return <-impl.replier
+type Operation struct {
+	args    OpArgs
+	replyCh chan OpReply
 }
 
-func (impl *PBServerImpl) doTick() {
-	impl.ticker <- struct{}{}
+type Push struct {
+	args    PushArgs
+	replyCh chan PushReply
 }
 
-func (impl *PBServerImpl) sendPush() PushReply {
-	impl.sendPusher <- struct{}{}
-	return <-impl.pushReplier
+func (impl *PBServerImpl) forwardOperation(args OpArgs, primary string, backup string, forwardReply *OpReply) bool {
+	// log.Println("Forwarding to backup:", backup)
+	fargs := args
+	fargs.Source = primary
+	// Force retry until success
+
+	ok := call(backup, "PBServer.Operation", fargs, &forwardReply)
+	log.Println("Forward reply: ", forwardReply)
+	return ok
 }
 
-func (impl *PBServerImpl) receivePush(args PushArgs) {
-	impl.receivePusher <- args
+func (pb *PBServer) runServer() {
+	database := make(map[string]string)
+	opcache := make(map[string]Result)
+	pb.impl.currentView = viewservice.View{Viewnum: 0, Primary: "", Backup: ""}
+
+	Ping := func() {
+		latestView, err := pb.vs.Ping(pb.impl.currentView.Viewnum)
+		if err != nil {
+			log.Println("Ping error", err)
+			return
+		}
+		if pb.NeedPush(latestView) {
+			pushRetryNeeded := true
+			pb.impl.currentView = latestView
+
+			for pushRetryNeeded {
+				pargs := PushArgs{View: latestView, KVStore: database, OpCache: opcache}
+				var pushReply PushReply
+				log.Println("Pushing A")
+				ok := call(pb.impl.currentView.Backup, "PBServer.Push", pargs, &pushReply)
+				if ok {
+					pushRetryNeeded = false
+					break
+				}
+				if !ok {
+					log.Println("Push failed")
+				}
+				latestView, err := pb.vs.Ping(pb.impl.currentView.Viewnum)
+				if err != nil {
+					pb.impl.currentView = latestView
+				}
+			}
+
+		} else {
+			pb.impl.currentView = latestView
+		}
+		log.Println("Current view: ", pb.impl.currentView)
+	}
+
+	for {
+		// log.Println("Waiting for operation on", pb.me)
+		select {
+		case operation := <-pb.impl.operator:
+			args := operation.args
+			log.Println("Operation called: ", args.Source, args.Op, args.Key, args.Value, args.Client, args.SeqNo)
+			log.Println("My view: ", pb.impl.currentView, pb.me)
+
+			if _, exists := opcache[args.Client]; exists && args.SeqNo <= opcache[args.Client].SeqNo {
+				log.Println("Duplicate operation from client", args.Client, args.SeqNo)
+				operation.replyCh <- opcache[args.Client].V
+				continue
+			}
+			// This is the new, single point for all client operations.
+			var operationReply OpReply
+			operationReply.Err = OK
+			// 1) Print debug logs (moved from Operation())
+			// log.Printf("Operation called by %s for %s key=%s val=%s; current P=%s B=%s\n",
+			// 	args.Source, args.Op, args.Key, args.Value,
+			// 	pb.impl.currentView.Primary, pb.impl.currentView.Backup)
+			//log.Println("I'm", pb.me)
+			if pb.WrongServerOp(args) {
+				log.Println("WrongServerOp", args.Source, args.Op, args.Key, args.Value, args.Client, args.SeqNo)
+				operationReply.Err = ErrWrongServer
+				operation.replyCh <- operationReply
+				continue
+			}
+
+			// 2) Possibly forward to backup
+			var forwardReply OpReply
+
+			if pb.NeedForward() {
+				// log.Println("About to forward, I'm", pb.me)
+				fargs := args
+				fargs.Source = pb.me
+				retryNeeded := true
+				for retryNeeded {
+
+					ok := call(pb.impl.currentView.Backup, "PBServer.Operation", fargs, &forwardReply)
+					log.Println("Forward reply: ", forwardReply)
+					if ok {
+						retryNeeded = false
+						break
+					} else if !ok {
+						log.Println("Forward failed, retrying")
+					}
+
+					// Refresh view
+					latestView, _ := pb.vs.Ping(pb.impl.currentView.Viewnum)
+					pb.impl.currentView = latestView
+
+					// Push if needed
+					// if pb.NeedPush(latestView) {
+					// 	pushRetryNeeded := true
+					// 	pb.impl.currentView = latestView
+
+					// 	for pushRetryNeeded {
+					// 		pargs := PushArgs{View: latestView, KVStore: database, OpCache: opcache}
+					// 		var pushReply PushReply
+					// 		log.Println("Pushing A")
+					// 		ok := call(pb.impl.currentView.Backup, "PBServer.Push", pargs, &pushReply)
+					// 		if ok {
+					// 			pushRetryNeeded = false
+					// 			break
+					// 		}
+					// 		if !ok {
+					// 			log.Println("Push failed")
+					// 		}
+					// 	}
+
+					// } else {
+					// 	pb.impl.currentView = latestView
+					// }
+					// log.Println("Current view: ", pb.impl.currentView)
+				}
+			}
+
+			// 3) Check if error from forwarding
+			if forwardReply.Err == ErrWrongServer {
+				log.Println("WrongServerOp", args.Source, args.Op, args.Key, args.Value, args.Client, args.SeqNo)
+				operationReply.Err = ErrWrongServer
+				operation.replyCh <- operationReply
+				continue
+			}
+
+			// Apply the operation locally
+			switch args.Op {
+			case "Put":
+				database[args.Key] = args.Value
+			case "Append":
+				database[args.Key] += args.Value
+			case "Get":
+				val := database[args.Key]
+				log.Println("Get value", val)
+				operationReply.Value = val
+			default:
+				operationReply.Err = "UnknownOp"
+			}
+
+			opcache[args.Client] = Result{SeqNo: args.SeqNo, V: operationReply}
+			operation.replyCh <- operationReply
+
+		case <-pb.impl.ticker:
+			log.Println("Received tick")
+			Ping()
+
+		case push := <-pb.impl.pusher:
+			var pushReply PushReply
+			log.Println("Pulling on backup")
+			database = push.args.KVStore
+			opcache = push.args.OpCache
+			log.Println("Printing opcache:")
+			for k, v := range opcache {
+				log.Println("ABC")
+				log.Println(k, v)
+			}
+			pb.impl.currentView = push.args.View
+			pushReply.Err = OK
+			push.replyCh <- pushReply
+		}
+	}
 }
 
 // your pb.impl.* initializations here.
 func (pb *PBServer) initImpl() {
 	// Create channels
-	pb.impl.operator = make(chan OpArgs)
-	pb.impl.ticker = make(chan interface{})
-	pb.impl.replier = make(chan OpReply)
-	pb.impl.sendPusher = make(chan interface{})
-	pb.impl.pushReplier = make(chan PushReply)
-	pb.impl.receivePusher = make(chan PushArgs)
+	pb.impl.operator = make(chan Operation)
+	pb.impl.ticker = make(chan struct{})
+	pb.impl.pusher = make(chan Push)
 	pb.impl.end = make(chan interface{})
-	pb.impl.currentView = viewservice.View{}
 
 	// Start the goroutine
-	go func() {
-		database := make(map[string]string)
-		opcache := make(map[string]Result)
-
-		for {
-			select {
-			case args := <-pb.impl.operator:
-
-				if _, exists := opcache[args.Client]; exists && args.SeqNo <= opcache[args.Client].SeqNo {
-					log.Printf("Duplicate operation from %s\n", args.Client)
-					pb.impl.replier <- opcache[args.Client].V
-					continue
-				}
-				// This is the new, single point for all client operations.
-				reply := OpReply{Err: OK} // We'll fill this in.
-
-				// 1) Print debug logs (moved from Operation())
-				log.Printf("Operation called by %s for %s key=%s val=%s; current P=%s B=%s\n",
-					args.Source, args.Op, args.Key, args.Value,
-					pb.impl.currentView.Primary, pb.impl.currentView.Backup)
-				log.Println("I'm", pb.me)
-				log.Println("Current view: ", pb.impl.currentView)
-
-				// 2) Possibly forward to backup
-				var forwardReply OpReply
-				if pb.NeedForward() {
-					log.Println("Forwarding to backup:", pb.impl.currentView.Backup)
-					fargs := args
-					fargs.Source = pb.me
-
-					ok := call(pb.impl.currentView.Backup, "PBServer.Operation", fargs, &forwardReply)
-
-					// Requeue in case of failure
-					if !ok {
-						break
-					}
-
-					// 3) Check if error from forwarding
-					if forwardReply.Err == ErrWrongServer || pb.WrongServerOp(args) {
-						reply.Err = ErrWrongServer
-						pb.impl.replier <- reply
-						continue
-					}
-
-				}
-
-				// 4) Actually apply the operation locally
-				switch args.Op {
-				case "Put":
-					database[args.Key] = args.Value
-				case "Append":
-					database[args.Key] += args.Value
-				case "Get":
-					val := database[args.Key]
-					reply.Value = val
-				default:
-					reply.Err = "UnknownOp"
-				}
-
-				// If you want to store results in opcache, do so:
-				opcache[args.Client] = Result{SeqNo: args.SeqNo, V: reply}
-
-				// 5) Return final reply
-				pb.impl.replier <- reply
-			case <-pb.impl.ticker:
-				log.Println("Received tick")
-				latestView, err := pb.vs.Ping(pb.impl.currentView.Viewnum)
-				if err != nil {
-					log.Println("Ping error", err)
-					return
-				}
-				if pb.NeedPush(latestView) {
-					pb.impl.currentView = latestView
-					pb.impl.sendPush()
-				} else {
-					pb.impl.currentView = latestView
-				}
-				log.Println("Current view: ", pb.impl.currentView)
-			case <-pb.impl.sendPusher:
-				// Pushing logic remains the same
-				pargs := PushArgs{
-					KVStore: database,
-					OpCache: opcache,
-					View:    pb.impl.currentView,
-				}
-				var pushReply PushReply
-				log.Println("sendPush received")
-				log.Printf("Push: primary=%s, backup=%s\n",
-					pb.me, pb.impl.currentView.Backup)
-				log.Println(database["1"])
-
-				for {
-					ok := call(pb.impl.currentView.Backup, "PBServer.Push", pargs, &pushReply)
-					// Push successful, break out of loop
-					if ok {
-						break
-					}
-					if !ok {
-						log.Println("Push failed error", pushReply.Err)
-					}
-					// Able to make connection with backup, but backup identifies split brain
-					if pushReply.Err == ErrWrongServer {
-						pushReply.Err = ErrWrongServer
-						pb.impl.pushReplier <- pushReply
-						continue
-					}
-				}
-
-			case pushArgs := <-pb.impl.receivePusher:
-				log.Println("Pulling on backup")
-				database = pushArgs.KVStore
-				opcache = pushArgs.OpCache
-				pb.impl.currentView = pushArgs.View
-				log.Printf(database["1"])
-
-			}
-		}
-	}()
+	go pb.runServer()
 }
 
 func (pb *PBServer) NeedForward() bool {
@@ -186,14 +227,23 @@ func (pb *PBServer) WrongServerOp(args OpArgs) bool {
 
 // server Operation() RPC handler.
 func (pb *PBServer) Operation(args OpArgs, reply *OpReply) error {
-	*reply = pb.impl.doOperation(args)
+	op := Operation{
+		args:    args,
+		replyCh: make(chan OpReply),
+	}
+	pb.impl.operator <- op
+	*reply = <-op.replyCh
 	return nil
 }
 
 // server Push() RPC handler
 func (pb *PBServer) Push(args PushArgs, reply *PushReply) error {
-	log.Println("Push received")
-	pb.impl.receivePush(args)
+	push := Push{
+		args:    args,
+		replyCh: make(chan PushReply),
+	}
+	pb.impl.pusher <- push
+	*reply = <-push.replyCh
 	return nil
 }
 
@@ -203,7 +253,8 @@ func (pb *PBServer) Push(args PushArgs, reply *PushReply) error {
 //	transition to new view.
 //	manage transfer of state from primary to new backup.
 func (pb *PBServer) NeedPush(latestView viewservice.View) bool {
-	return pb.impl.currentView.Primary == pb.me && latestView.Backup != pb.impl.currentView.Backup
+	return (pb.impl.currentView.Primary == pb.me && latestView.Backup != pb.impl.currentView.Backup) ||
+		(pb.impl.currentView.Primary == pb.me && latestView.Backup == pb.impl.currentView.Backup && pb.impl.currentView.Viewnum != latestView.Viewnum)
 }
 
 // func (pb *PBServer) BackupPromoted(latestView viewservice.View) bool {
@@ -211,5 +262,6 @@ func (pb *PBServer) NeedPush(latestView viewservice.View) bool {
 // }
 
 func (pb *PBServer) tick() {
-	pb.impl.doTick()
+	pb.impl.ticker <- struct{}{}
+
 }
