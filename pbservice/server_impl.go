@@ -27,21 +27,29 @@ type Push struct {
 	replyCh chan PushReply
 }
 
-func (impl *PBServerImpl) forwardOperation(args OpArgs, primary string, backup string, forwardReply *OpReply) bool {
-	// log.Println("Forwarding to backup:", backup)
-	fargs := args
-	fargs.Source = primary
-	// Force retry until success
-
-	ok := call(backup, "PBServer.Operation", fargs, &forwardReply)
-	// log.Println("Forward reply: ", forwardReply)
-	return ok
-}
 
 func (pb *PBServer) runServer() {
 	database := make(map[string]string)
 	opcache := make(map[string]Result)
 	pb.impl.currentView = viewservice.View{Viewnum: 0, Primary: "", Backup: ""}
+
+	NeedForward := func() bool {
+		return pb.impl.currentView.Primary == pb.me && pb.impl.currentView.Backup != ""
+	}
+
+	NeedPush := func(latestView viewservice.View) bool {
+		// Case A: New backup
+		// Case B: Same backup, but backup has restarted and lost state
+		// Case C: Backup promoted to primary and new backup
+		return (pb.impl.currentView.Primary == pb.me && latestView.Backup != pb.impl.currentView.Backup) ||
+			(pb.impl.currentView.Primary == pb.me && latestView.Backup == pb.impl.currentView.Backup && pb.impl.currentView.Viewnum != latestView.Viewnum) ||
+			(pb.impl.currentView.Backup == pb.me && latestView.Primary == pb.me && latestView.Backup != "")
+	}
+
+	WrongServerOp := func(args OpArgs) bool {
+		return (pb.impl.currentView.Primary != pb.me && args.Source != pb.impl.currentView.Primary) ||
+			(args.Source != args.Client && args.Source != pb.impl.currentView.Primary)
+	}
 
 	UpdateView := func() {
 		latestView, err := pb.vs.Ping(pb.impl.currentView.Viewnum)
@@ -53,7 +61,7 @@ func (pb *PBServer) runServer() {
 			//log.Println("Ping error", err)
 			return
 		}
-		if pb.NeedPush(latestView) {
+		if NeedPush(latestView) {
 			pushRetryNeeded := true
 			pb.impl.currentView = latestView
 
@@ -113,7 +121,7 @@ func (pb *PBServer) runServer() {
 			// 	args.Source, args.Op, args.Key, args.Value,
 			// 	pb.impl.currentView.Primary, pb.impl.currentView.Backup)
 			//log.Println("I'm", pb.me)
-			if pb.WrongServerOp(args) {
+			if WrongServerOp(args) {
 				log.Println("WrongServerOp", args.Source, args.Op, args.Key, args.Value, args.Client, args.SeqNo)
 				operationReply.Err = ErrWrongServer
 				operation.replyCh <- operationReply
@@ -123,7 +131,7 @@ func (pb *PBServer) runServer() {
 			// 2) Possibly forward to backup
 			var forwardReply OpReply
 
-			if pb.NeedForward() {
+			if NeedForward() {
 				// log.Println("About to forward, I'm", pb.me)
 				fargs := args
 				fargs.Source = pb.me
@@ -202,15 +210,8 @@ func (pb *PBServer) initImpl() {
 	go pb.runServer()
 }
 
-func (pb *PBServer) NeedForward() bool {
-	return pb.impl.currentView.Primary == pb.me && pb.impl.currentView.Backup != ""
-}
-
 // On the backup side, if you receive an operation from
-func (pb *PBServer) WrongServerOp(args OpArgs) bool {
-	return (pb.impl.currentView.Primary != pb.me && args.Source != pb.impl.currentView.Primary) ||
-		(args.Source != args.Client && args.Source != pb.impl.currentView.Primary)
-}
+
 
 // func (pb *PBServer) WrongServerPush(args PushArgs) bool {
 // 	return (pb.impl.currentView.Primary && args.Source != pb.impl.currentView.Primary) ||
@@ -243,14 +244,7 @@ func (pb *PBServer) Push(args PushArgs, reply *PushReply) error {
 //
 //	transition to new view.
 //	manage transfer of state from primary to new backup.
-func (pb *PBServer) NeedPush(latestView viewservice.View) bool {
-	// Case A: New backup
-	// Case B: Same backup, but backup has restarted and lost state
-	// Case C: Backup promoted to primary and new backup
-	return (pb.impl.currentView.Primary == pb.me && latestView.Backup != pb.impl.currentView.Backup) ||
-		(pb.impl.currentView.Primary == pb.me && latestView.Backup == pb.impl.currentView.Backup && pb.impl.currentView.Viewnum != latestView.Viewnum) ||
-		(pb.impl.currentView.Backup == pb.me && latestView.Primary == pb.me && latestView.Backup != "")
-}
+
 
 // func (pb *PBServer) BackupPromoted(latestView viewservice.View) bool {
 // 	return pb.impl.currentView.Backup == pb.me && latestView.Primary != pb.impl.currentView.Primary
