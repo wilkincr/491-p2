@@ -111,7 +111,7 @@ func StartServer(vshost string, me string, term <-chan interface{}) *PBServer {
 
 	go func() {
 		for pb.isdead() == false {
-			log.Println("Ticking on", pb.me)
+			// log.Println("Ticking on", pb.me)
 			pb.tick()
 			time.Sleep(viewservice.PingInterval)
 		}
